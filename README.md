@@ -1,14 +1,16 @@
 # Pool-Based Active Learning Benchmark
 
-This is an implementation of our paper: "[Re-benchmarking Pool-Based Active Learning for Binary Classification](https://arxiv.org/abs/2306.08954)"
+This is an implementation of our paper: "[An Expanded Benchmark that Rediscovers and Affirms the Edge of Uncertainty Sampling for Active Learning in Tabular Datasets](https://arxiv.org/abs/2306.08954)", which is updated from "Re-benchmarking Pool-Based Active Learning for Binary Classification".
 
 We reproduce and re-benchmark the previous work: [#SV74 A Comparative Survey: Benchmarking for Pool-based Active Learning](https://ijcai-21.org/program-survey/)
 
-*Update on 04/17*, we notice that *Zhan et al.* released the source code: <https://github.com/SineZHAN/ComparativeSurveyIJCAI2021PoolBasedAL>
+*Update on 2024/04/17*, we notice that *Zhan et al.* released the source code: <https://github.com/SineZHAN/ComparativeSurveyIJCAI2021PoolBasedAL>
 
-*Update on 07/23*, we merge our paper to the benchmark."[A More Robust Baseline for Active Learning by Injecting Randomness to Uncertainty Sampling](https://icml.cc/virtual/2023/27400)". Please change the branch to **robust-baseline**.
+*Update on 2024/07/23*, we merge our paper to the benchmark."[A More Robust Baseline for Active Learning by Injecting Randomness to Uncertainty Sampling](https://icml.cc/virtual/2023/27400)". Please change the branch to **robust-baseline**.
 
 - `git checkout robust-baseline`
+
+*Update on 2025/06/24*, our paper is accepted by [TMLR 2025/06](https://openreview.net/forum?id=855yo1Ubt2) and get **Reproducibility Certification**.
 
 ## Quick start
 
@@ -18,16 +20,19 @@ We call for the community to further provide more experimental results to this b
 We provide below suggested future work:
 
 1. Models for tabular datasets
-    - Random Forest
-    - Gradient Boosting Decision Trees
-2. Tasks and domains
-    - multi-class classifications
-    - regression problems
-    - image classifications
-    - object detection
-    - natural language processing
+    - [x] Random Forest
+    - [x] Gradient Boosting Decision Trees
+    - [ ] [TabPFN](https://github.com/PriorLabs/TabPFN)
+3. Tasks and domains
+    - [x] multi-class classifications
+    - [ ] regression problems
+    - [x] image classifications with pre-trained embedding as the tabular data
+    - [x] natural language processing with pre-trained embedding as the tabular data
 4. Evaluation metrics
-    - Deficiency score, Data Utilization Rate, Start Quality, and Average End Quality
+    - [x] Deficiency score
+    - [x] Data Utilization Rate
+    - [x] Start Quality
+    - [x] Average End Quality
 
 ### How to start?
 
@@ -52,7 +57,7 @@ python main.py -h  # call helper functions
 
 ## Installation
 
-Note. We only verify the installation steps on Ubuntu. Please raise the issue if you have any problem.
+Note. We only verify the installation steps on Ubuntu. Please raise the issue if you have any problems.
 
 When you use Python in [3.8, 3.9].
 
@@ -99,7 +104,7 @@ You CANNOT obtain the results of Variability Reduction (VR) for the benchmark.
 
 ## Step-by-Step tutorial
 
-Bellowing examples demonstrate how to use the benchmark for quick use, evaluating existing AL query strategies on your own datasets, and adding new AL query strategies for evaluating.
+Below are examples that demonstrate how to use the benchmark for quick use, evaluating existing AL query strategies on your own datasets, and adding new AL query strategies for evaluating.
 
 ### Running AL experiments
 
@@ -109,13 +114,13 @@ This is an example of running compatible uncertainty sampling (US-C) on *Haberma
 
 ### Evaluation (WIP)
 
-TODO. Split evaluation part from *main.py*
+- [ ] Split the evaluation part from *main.py*
 
 ### Customize datasets (WIP)
 
 ### Customize query strategies (WIP)
 
-## Reproduce all experiments for [Re-benchmarking Pool-Based Active Learning for Binary Classification](https://arxiv.org/abs/2306.08954)
+## Reproduce all experiments for [this work](https://arxiv.org/abs/2306.08954)
 
 ### List of current settings
 
@@ -178,13 +183,14 @@ python analysis.py;  # choice 1
 If you use our code in your research or applications, please consider citing our and previous papers.
 
 ```
-@misc{lu2023rebenchmarking,
-      title={Re-Benchmarking Pool-Based Active Learning for Binary Classification}, 
-      author={Po-Yi Lu and Chun-Liang Li and Hsuan-Tien Lin},
-      year={2023},
-      eprint={2306.08954},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+@article{lu2025an,
+  title={An Expanded Benchmark that Rediscovers and Affirms the Edge of Uncertainty Sampling for Active Learning in Tabular Datasets},
+  author={Po-Yi Lu and Yi-Jie Cheng and Chun-Liang Li and Hsuan-Tien Lin},
+  journal={Transactions on Machine Learning Research},
+  issn={2835-8856},
+  year={2025},
+  url={https://openreview.net/forum?id=855yo1Ubt2},
+  note={Reproducibility Certification}
 }
 ```
 
@@ -197,6 +203,12 @@ If you use our code in your research or applications, please consider citing our
   year={2021}
 }
 ```
+
+## Related AL benchmark for the tabular data
+
+We are glad to see more research community investigate the AL methods for tabular data.
+
+- [ALPBench: A Benchmark for Active Learning Pipelines on Tabular Data](https://github.com/valentinmargraf/activelearningpipelines)
 
 ## Contact
 If you have any further questions or want to discuss Active Learning with me, please leave issues or contact Po-Yi (Poy) Lu <ariapoy@gmail.com>/<d09944015@csie.ntu.edu.tw>.
