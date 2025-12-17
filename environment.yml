@@ -1,0 +1,8 @@
+name: active-learning-benchmark
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pip
+  - pip:
+    - -r requirements-py313.txt
