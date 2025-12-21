@@ -99,7 +99,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         X_processed, y_processed = self._validate_and_truncate(X, y, fit_mode=True)
         
         self.model = TabPFNClassifier(
-            N_ensemble_configurations=self.N_ensemble_configurations,
+            n_estimators=self.N_ensemble_configurations,
             device=self.device,
             **self.kwargs
         )

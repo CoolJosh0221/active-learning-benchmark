@@ -337,6 +337,12 @@ def parse_args():
                         help='default or best hyper-parameters of the base model')
     parser.add_argument('--export_name_suffix', default="", type=str,
                         help='Suffix of export name')
+    parser.add_argument('--model', dest='model',
+                        help='Model name (e.g., tabpfn) to override hs_name and gs_name',
+                        default=None, type=str)
+    parser.add_argument('--exp_name', dest='exp_name',
+                        help='Experiment name to override default naming',
+                        default=None, type=str)
 
     args = parser.parse_args()
     return args
@@ -348,6 +354,12 @@ if __name__ == '__main__':
     tool_name = args.tool
     # query strategy
     qs_name, hs_name, gs_name = args.qs_name, args.hs_name, args.gs_name
+    
+    # Override model if provided
+    if args.model:
+        hs_name = args.model
+        gs_name = args.model
+        
     if gs_name == 'None':
         gs_name = None
     # exps
@@ -355,9 +367,12 @@ if __name__ == '__main__':
     # dataset configs
     data_set, tst_size, init_lbl_size = args.data_set, args.tst_size, args.init_lbl_size
     # env
-    exp_name = f"{args.hyperparams_type}_hyperparams-{args.init_lbl_type}-bs_{args.batch_size}-initialseeds_{args.init_trn_tst_fix_type}_{args.init_set_fix_type}"
-    if args.scale:
-        exp_name = f"{exp_name}-scale"
+    if args.exp_name:
+        exp_name = args.exp_name
+    else:
+        exp_name = f"{args.hyperparams_type}_hyperparams-{args.init_lbl_type}-bs_{args.batch_size}-initialseeds_{args.init_trn_tst_fix_type}_{args.init_set_fix_type}"
+        if args.scale:
+            exp_name = f"{exp_name}-scale"
 
     # path
     export_name =  f'{data_set}-{qs_name}-{hs_name}-{gs_name}-{exp_name}'

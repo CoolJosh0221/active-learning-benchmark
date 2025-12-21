@@ -53,9 +53,9 @@ QUERY_STRATEGIES = {
         'description': 'Random Sampling (Baseline)',
     },
     'QBC': {
-        'name': 'qbc',
+        'name': 'alipy_qbc',
         'hs': 'google-zhan',
-        'tool': 'google',
+        'tool': 'alipy',
         'description': 'Query By Committee',
     },
     'BALD': {
@@ -65,9 +65,9 @@ QUERY_STRATEGIES = {
         'description': 'Bayesian Active Learning by Disagreement',
     },
     'Core-Set': {
-        'name': 'core-set',
+        'name': 'skal_coreset',
         'hs': 'google-zhan',
-        'tool': 'google',
+        'tool': 'scikital',
         'description': 'Core-Set Selection',
     },
 }
@@ -144,7 +144,7 @@ class ExperimentRunner:
             '--n_trials', '1',
             '--init_lbl_size', str(self.config['init_lbl_size']),
             '--tst_size', str(self.config['tst_size']),
-            '--budget', str(self.config['budget']),
+            '--total_budget', str(self.config['budget']),
             '--exp_name', self.config['exp_name'],
         ]
         

@@ -3,6 +3,7 @@ from sklearn.svm import SVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
+from models.tabpfn_model import TabPFNWrapper
 
 from headers import *
 
@@ -56,6 +57,8 @@ def _XGBoostClassifier(**kwargs):
     return xgb.XGBClassifier(**default_config)
 
 def SelectModelBuilder(name):
+    if name == 'tabpfn':
+        return TabPFNWrapper(device='cpu', N_ensemble_configurations=32)
     if name == 'XGBoost':
         return _XGBoostClassifier()
     if name == 'RandomForest':
@@ -79,6 +82,8 @@ def SelectModelBuilder(name):
     raise NotImplementedError
 
 def ScoreModelBuilder(name):
+    if name == 'tabpfn':
+        return TabPFNWrapper(device='cpu', N_ensemble_configurations=32)
     if name == 'XGBoost':
         return _XGBoostClassifier()
     if name == 'RandomForest':
@@ -111,8 +116,10 @@ def QueryStrategyBuilder(name):
         return { "qs": libact_QUIRE, "params": {"lambda": 1.0, "kernel": "rbf", "degree": 3, "gamma": 1.0, "coef0": 1.0 }}
     if name == 'hintsvm':
         return { "qs": libact_HSVM, "params": {"Cl": 1.0, "Ch": 1.0, "p": 0.5, "random_state": 1126, "kernel": "rbf", "degree": 3, "gamma": 0.1, "coef0": 0.0, "tol": 1e-3, "shrinking": 1, "cache_size": 100 }}
+    if name == 'alipy_qbc':
+        return { "qs": QueryInstanceQBC, "params": {}, "select": {"batch_size": 1} }
     if name == 'qbc':
-        return { "qs": libact_QBC,"params": {"models": [], "disagreement": "vote", "random_state": 1126 }}
+        return { "qs": QueryInstanceQBC, "params": {}, "select": {"batch_size": 1} }
     if name == 'albl':
         return { "qs": libact_ALBL,"params": {"T": None,
             "query_strategies": [
@@ -178,4 +185,15 @@ def QueryStrategyBuilder(name):
         return { 'qs': MonteCarloEER, 'params': {'random_state': 1126} }
     if name == 'skal_coreset':
         return { 'qs': CoreSet, 'params': {'random_state': 1126} }
+
+    # TabPFN experiment strategies
+    if name == 'margin-zhan':
+        return { "qs": AL_MAPPING["margin"], "params": {"seed": 1126 }}
+    if name == 'margin-nc':
+        return { "qs": AL_MAPPING["margin"], "params": {"seed": 1126 }}
+    if name == 'random':
+        return { "qs": AL_MAPPING["uniform"], "params": {"seed": 1126 }}
+    if name == 'core-set':
+        return { "qs": AL_MAPPING["kcenter"], "params": {"seed": 1126 }}
+
     raise NotImplementedError

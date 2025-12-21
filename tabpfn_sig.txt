@@ -1,0 +1,675 @@
+TabPFNClassifier __init__ signature:
+(self, *, n_estimators: 'int' = 8, categorical_features_indices: 'Sequence[int] | None' = None, softmax_temperature: 'float' = 0.9, balance_probabilities: 'bool' = False, average_before_softmax: 'bool' = False, model_path: "str | Path | list[str] | list[Path] | Literal['auto'] | ClassifierModelSpecs | list[ClassifierModelSpecs]" = 'auto', device: 'DevicesSpecification' = 'auto', ignore_pretraining_limits: 'bool' = False, inference_precision: "_dtype | Literal['autocast', 'auto']" = 'auto', fit_mode: "Literal['low_memory', 'fit_preprocessors', 'fit_with_cache', 'batched']" = 'fit_preprocessors', memory_saving_mode: 'MemorySavingMode' = 'auto', random_state: 'int | np.random.RandomState | np.random.Generator | None' = 0, n_jobs: "Annotated[int | None, deprecated('Use n_preprocessing_jobs')]" = None, n_preprocessing_jobs: 'int' = 1, inference_config: 'dict | InferenceConfig | None' = None, differentiable_input: 'bool' = False, eval_metric: 'str | ClassifierEvalMetrics | None' = None, tuning_config: 'dict | ClassifierTuningConfig | None' = None) -> 'None'
+
+TabPFNClassifier help:
+Help on class TabPFNClassifier in module tabpfn.classifier:
+
+class TabPFNClassifier(sklearn.base.ClassifierMixin, sklearn.base.BaseEstimator)
+ |  TabPFNClassifier(
+ |      *,
+ |      n_estimators: 'int' = 8,
+ |      categorical_features_indices: 'Sequence[int] | None' = None,
+ |      softmax_temperature: 'float' = 0.9,
+ |      balance_probabilities: 'bool' = False,
+ |      average_before_softmax: 'bool' = False,
+ |      model_path: "str | Path | list[str] | list[Path] | Literal['auto'] | ClassifierModelSpecs | list[ClassifierModelSpecs]" = 'auto',
+ |      device: 'DevicesSpecification' = 'auto',
+ |      ignore_pretraining_limits: 'bool' = False,
+ |      inference_precision: "_dtype | Literal['autocast', 'auto']" = 'auto',
+ |      fit_mode: "Literal['low_memory', 'fit_preprocessors', 'fit_with_cache', 'batched']" = 'fit_preprocessors',
+ |      memory_saving_mode: 'MemorySavingMode' = 'auto',
+ |      random_state: 'int | np.random.RandomState | np.random.Generator | None' = 0,
+ |      n_jobs: "Annotated[int | None, deprecated('Use n_preprocessing_jobs')]" = None,
+ |      n_preprocessing_jobs: 'int' = 1,
+ |      inference_config: 'dict | InferenceConfig | None' = None,
+ |      differentiable_input: 'bool' = False,
+ |      eval_metric: 'str | ClassifierEvalMetrics | None' = None,
+ |      tuning_config: 'dict | ClassifierTuningConfig | None' = None
+ |  ) -> 'None'
+ |
+ |  TabPFNClassifier class.
+ |
+ |  Method resolution order:
+ |      TabPFNClassifier
+ |      sklearn.base.ClassifierMixin
+ |      sklearn.base.BaseEstimator
+ |      sklearn.utils._estimator_html_repr._HTMLDocumentationLinkMixin
+ |      sklearn.utils._metadata_requests._MetadataRequester
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __init__(
+ |      self,
+ |      *,
+ |      n_estimators: 'int' = 8,
+ |      categorical_features_indices: 'Sequence[int] | None' = None,
+ |      softmax_temperature: 'float' = 0.9,
+ |      balance_probabilities: 'bool' = False,
+ |      average_before_softmax: 'bool' = False,
+ |      model_path: "str | Path | list[str] | list[Path] | Literal['auto'] | ClassifierModelSpecs | list[ClassifierModelSpecs]" = 'auto',
+ |      device: 'DevicesSpecification' = 'auto',
+ |      ignore_pretraining_limits: 'bool' = False,
+ |      inference_precision: "_dtype | Literal['autocast', 'auto']" = 'auto',
+ |      fit_mode: "Literal['low_memory', 'fit_preprocessors', 'fit_with_cache', 'batched']" = 'fit_preprocessors',
+ |      memory_saving_mode: 'MemorySavingMode' = 'auto',
+ |      random_state: 'int | np.random.RandomState | np.random.Generator | None' = 0,
+ |      n_jobs: "Annotated[int | None, deprecated('Use n_preprocessing_jobs')]" = None,
+ |      n_preprocessing_jobs: 'int' = 1,
+ |      inference_config: 'dict | InferenceConfig | None' = None,
+ |      differentiable_input: 'bool' = False,
+ |      eval_metric: 'str | ClassifierEvalMetrics | None' = None,
+ |      tuning_config: 'dict | ClassifierTuningConfig | None' = None
+ |  ) -> 'None'
+ |      Construct a TabPFN classifier.
+ |
+ |      This constructs a classifier using the latest model and settings. If you would
+ |      like to use a previous model version, use `create_default_for_version()`
+ |      instead. You can also use `model_path` to specify a particular model.
+ |
+ |      Args:
+ |          n_estimators:
+ |              The number of estimators in the TabPFN ensemble. We aggregate the
+ |               predictions of `n_estimators`-many forward passes of TabPFN. Each
+ |               forward pass has (slightly) different input data. Think of this as an
+ |               ensemble of `n_estimators`-many "prompts" of the input data.
+ |
+ |          categorical_features_indices:
+ |              The indices of the columns that are suggested to be treated as
+ |              categorical. If `None`, the model will infer the categorical columns.
+ |              If provided, we might ignore some of the suggestion to better fit the
+ |              data seen during pre-training.
+ |
+ |              !!! note
+ |                  The indices are 0-based and should represent the data passed to
+ |                  `.fit()`. If the data changes between the initializations of the
+ |                  model and the `.fit()`, consider setting the
+ |                  `.categorical_features_indices` attribute after the model was
+ |                  initialized and before `.fit()`.
+ |
+ |          softmax_temperature:
+ |              The temperature for the softmax function. This is used to control the
+ |              confidence of the model's predictions. Lower values make the model's
+ |              predictions more confident. This is only applied when predicting during
+ |              a post-processing step. Set `softmax_temperature=1.0` for no effect. Be
+ |              advised that `.predict()` does not currently sample, so this setting is
+ |              only relevant for `.predict_proba()` and `.predict_logits()`.
+ |
+ |          balance_probabilities:
+ |              Whether to balance the probabilities based on the class distribution
+ |              in the training data. This can help to improve predictive performance
+ |              when the classes are highly imbalanced and the metric of interest is
+ |              insensitive to class imbalance (e.g., balanced accuracy, balanced log
+ |              loss, roc-auc macro ovo, etc.). This is only applied when predicting
+ |              during a post-processing step.
+ |
+ |          average_before_softmax:
+ |              Only used if `n_estimators > 1`. Whether to average the predictions of
+ |              the estimators before applying the softmax function. This can help to
+ |              improve predictive performance when there are many classes or when
+ |              calibrating the model's confidence. This is only applied when predicting
+ |              during a post-processing.
+ |
+ |              - If `True`, the predictions are averaged before applying the softmax
+ |                function. Thus, we average the logits of TabPFN and then apply the
+ |                softmax.
+ |              - If `False`, the softmax function is applied to each set of logits.
+ |                Then, we average the resulting probabilities of each forward pass.
+ |
+ |          model_path:
+ |              The path to the TabPFN model file, i.e., the pre-trained weights.
+ |              Can be a list of paths to load multiple models. If a list is provided,
+ |              the models are applied across different estimators.
+ |
+ |              - If `"auto"`, the model will be downloaded upon first use. This
+ |                defaults to your system cache directory, but can be overwritten
+ |                with the use of an environment variable `TABPFN_MODEL_CACHE_DIR`.
+ |              - If a path or a string of a path, the model will be loaded from
+ |                the user-specified location if available, otherwise it will be
+ |                downloaded to this location.
+ |
+ |          device:
+ |              The device(s) to use for inference.
+ |
+ |              If "auto": a single device is selected based on availability in the
+ |              following order of priority: "cuda:0", "mps", "cpu".
+ |
+ |              To manually select a single device: specify a PyTorch device string e.g.
+ |              "cuda:1". See PyTorch's documentation for information about supported
+ |              devices.
+ |
+ |              To use several GPUs: specify a list of PyTorch GPU device strings, e.g.
+ |              ["cuda:0", "cuda:1"]. This can dramatically speed up inference for
+ |              larger datasets, by executing the estimators in parallel on the GPUs.
+ |
+ |          ignore_pretraining_limits:
+ |              Whether to ignore the pre-training limits of the model. The TabPFN
+ |              models have been pre-trained on a specific range of input data. If the
+ |              input data is outside of this range, the model may not perform well.
+ |              You may ignore our limits to use the model on data outside the
+ |              pre-training range.
+ |
+ |              - If `True`, the model will not raise an error if the input data is
+ |                outside the pre-training range. Also suppresses error when using
+ |                the model with more than 1000 samples on CPU.
+ |              - If `False`, you can use the model outside the pre-training range, but
+ |                the model could perform worse.
+ |
+ |              !!! note
+ |
+ |                  For version 2.5, the pre-training limits are:
+ |
+ |                  - 50_000 samples/rows
+ |                  - 2_000 features/columns (Note that for more than 500 features we
+ |                      subsample 500 features per estimator. It is therefore important
+ |                      to use a sufficiently large number of `n_estimators`.)
+ |                  - 10 classes, this is not ignorable and will raise an error
+ |                    if the model is used with more classes.
+ |
+ |          inference_precision:
+ |              The precision to use for inference. This can dramatically affect the
+ |              speed and reproducibility of the inference. Higher precision can lead to
+ |              better reproducibility but at the cost of speed. By default, we optimize
+ |              for speed and use torch's mixed-precision autocast. The options are:
+ |
+ |              - If `torch.dtype`, we force precision of the model and data to be
+ |                the specified torch.dtype during inference. This can is particularly
+ |                useful for reproducibility. Here, we do not use mixed-precision.
+ |              - If `"autocast"`, enable PyTorch's mixed-precision autocast. Ensure
+ |                that your device is compatible with mixed-precision.
+ |              - If `"auto"`, we determine whether to use autocast or not depending on
+ |                the device type.
+ |
+ |          fit_mode:
+ |              Determine how the TabPFN model is "fitted". The mode determines how the
+ |              data is preprocessed and cached for inference. This is unique to an
+ |              in-context learning foundation model like TabPFN, as the "fitting" is
+ |              technically the forward pass of the model. The options are:
+ |
+ |              - If `"low_memory"`, the data is preprocessed on-demand during inference
+ |                when calling `.predict()` or `.predict_proba()`. This is the most
+ |                memory-efficient mode but can be slower for large datasets because
+ |                the data is (repeatedly) preprocessed on-the-fly.
+ |                Ideal with low GPU memory and/or a single call to `.fit()` and
+ |                `.predict()`.
+ |              - If `"fit_preprocessors"`, the data is preprocessed and cached once
+ |                during the `.fit()` call. During inference, the cached preprocessing
+ |                (of the training data) is used instead of re-computing it.
+ |                Ideal with low GPU memory and multiple calls to `.predict()` with
+ |                the same training data.
+ |              - If `"fit_with_cache"`, the data is preprocessed and cached once during
+ |                the `.fit()` call like in `fit_preprocessors`. Moreover, the
+ |                transformer key-value cache is also initialized, allowing for much
+ |                faster inference on the same data at a large cost of memory.
+ |                Ideal with very high GPU memory and multiple calls to `.predict()`
+ |                with the same training data.
+ |              - If `"batched"`, the already pre-processed data is iterated over in
+ |                batches. This can only be done after the data has been preprocessed
+ |                with the get_preprocessed_datasets function. This is primarily used
+ |                only for inference with the InferenceEngineBatchedNoPreprocessing
+ |                class in Fine-Tuning. The fit_from_preprocessed() function sets this
+ |                attribute internally.
+ |
+ |          memory_saving_mode:
+ |              Enable GPU/CPU memory saving mode. This can both avoid out-of-memory
+ |              errors and improve fit+predict speed by reducing memory pressure.
+ |
+ |              It saves memory by automatically batching certain model computations
+ |              within TabPFN.
+ |
+ |              - If "auto": memory saving mode is enabled/disabled automatically based
+ |                  on a heuristic
+ |              - If True/False: memory saving mode is forced enabled/disabled.
+ |
+ |              If speed is important to your application, you may wish to manually tune
+ |              this option by comparing the time taken for fit+predict with it set to
+ |              False and True.
+ |
+ |              !!! warning
+ |                  This does not batch the original input data. We still recommend to
+ |                  batch the test set as necessary if you run out of memory.
+ |
+ |          random_state:
+ |              Controls the randomness of the model. Pass an int for reproducible
+ |              results and see the scikit-learn glossary for more information. If
+ |              `None`, the randomness is determined by the system when calling
+ |              `.fit()`.
+ |
+ |              !!! warning
+ |                  We depart from the usual scikit-learn behavior in that by default
+ |                  we provide a fixed seed of `0`.
+ |
+ |              !!! note
+ |                  Even if a seed is passed, we cannot always guarantee reproducibility
+ |                  due to PyTorch's non-deterministic operations and general numerical
+ |                  instability. To get the most reproducible results across hardware,
+ |                  we recommend using a higher precision as well (at the cost of a
+ |                  much higher inference time). Likewise, for scikit-learn, consider
+ |                  passing `USE_SKLEARN_16_DECIMAL_PRECISION=True` as kwarg.
+ |
+ |          n_jobs:
+ |              Deprecated, use `n_preprocessing_jobs` instead.
+ |              This parameter never had any effect.
+ |
+ |          n_preprocessing_jobs:
+ |              The number of worker processes to use for the preprocessing.
+ |
+ |              If `1`, the preprocessing will be performed in the current process,
+ |              parallelised across multiple CPU cores. If `>1` and `n_estimators > 1`,
+ |              then different estimators will be dispatched to different processes.
+ |
+ |              We strongly recommend setting this to 1, which has the lowest overhead
+ |              and can often fully utilise the CPU. Values >1 can help if you have lots
+ |              of CPU cores available, but can also be slower.
+ |
+ |          inference_config:
+ |              For advanced users, additional advanced arguments that adjust the
+ |              behavior of the model interface.
+ |              See [tabpfn.inference_config.InferenceConfig][] for details and options.
+ |
+ |              - If `None`, the default InferenceConfig is used.
+ |              - If `dict`, the key-value pairs are used to update the default
+ |                `InferenceConfig`. Raises an error if an unknown key is passed.
+ |              - If `InferenceConfig`, the object is used as the configuration.
+ |
+ |          differentiable_input:
+ |              If true, the preprocessing will be adapted to be end-to-end
+ |              differentiable with PyTorch.
+ |              This is useful for explainability and prompt-tuning, essential
+ |              in the prompttuning code.
+ |
+ |          eval_metric:
+ |              Metric by which predictions will be ultimately evaluated on test data.
+ |              This can be used to improve this metric on validation data by
+ |              calibrating the model's probabilities and tuning the decision
+ |              thresholds during the `fit()/predict()` calls. The tuning can be
+ |              enabled by configuring the `tuning_config` argument, see below.
+ |              For currently supported metrics, see
+ |              [tabpfn.classifier.ClassifierEvalMetrics][].
+ |
+ |          tuning_config:
+ |              The settings to use to tune the model's predictions for the specified
+ |              `eval_metric`. See
+ |              [tabpfn.inference_tuning.ClassifierTuningConfig][] for details
+ |              and options.
+ |
+ |  __sklearn_tags__(self) -> 'Tags'
+ |
+ |  fit(self, X: 'XType', y: 'YType') -> 'Self'
+ |      Fit the model.
+ |
+ |      Args:
+ |          X: The input data.
+ |          y: The target variable.
+ |
+ |      Returns:
+ |          self
+ |
+ |  fit_from_preprocessed(
+ |      self,
+ |      X_preprocessed: 'list[torch.Tensor]',
+ |      y_preprocessed: 'list[torch.Tensor]',
+ |      cat_ix: 'list[list[int]]',
+ |      configs: 'list[list[EnsembleConfig]]',
+ |      *,
+ |      no_refit: 'bool' = True
+ |  ) -> 'TabPFNClassifier'
+ |      Used in Fine-Tuning. Fit the model to preprocessed inputs from torch
+ |      dataloader inside a training loop a Dataset provided by
+ |      get_preprocessed_datasets. This function sets the fit_mode attribute
+ |      to "batched" internally.
+ |
+ |      Args:
+ |          X_preprocessed: The input features obtained from the preprocessed Dataset
+ |              The list contains one item for each ensemble predictor.
+ |              use tabpfn.utils.collate_for_tabpfn_dataset to use this function with
+ |              batch sizes of more than one dataset (see examples/tabpfn_finetune.py)
+ |          y_preprocessed: The target variable obtained from the preprocessed Dataset
+ |          cat_ix: categorical indices obtained from the preprocessed Dataset
+ |          configs: Ensemble configurations obtained from the preprocessed Dataset
+ |          no_refit: if True, the classifier will not be reinitialized when calling
+ |              fit multiple times.
+ |
+ |  forward(
+ |      self,
+ |      X: 'list[torch.Tensor] | torch.Tensor',
+ |      *,
+ |      use_inference_mode: 'bool' = False,
+ |      return_logits: 'bool' = False,
+ |      return_raw_logits: 'bool' = False
+ |  ) -> 'torch.Tensor'
+ |      Forward pass returning predicted probabilities or logits
+ |      for TabPFNClassifier Inference Engine. Used in
+ |      Fine-Tuning and prediction. Called directly
+ |      in FineTuning training loop or by predict() function
+ |      with the use_inference_mode flag explicitly set to True.
+ |
+ |      Iterates over outputs of InferenceEngine.
+ |
+ |      Args:
+ |          X: list[torch.Tensor] in fine-tuning, XType in normal predictions.
+ |          use_inference_mode: Flag for inference mode., default at False since
+ |          it is called within predict. During FineTuning forward() is called
+ |          directly by user, so default should be False here.
+ |          return_logits: If True, returns logits averaged across estimators.
+ |              Otherwise, probabilities are returned.
+ |          return_raw_logits: If True, returns the raw logits, without
+ |              averaging estimators or temperature scaling.
+ |
+ |      Returns:
+ |          The predicted probabilities or logits of the classes as a torch.Tensor.
+ |          - If `use_inference_mode` is True: Shape (N_samples, N_classes)
+ |          - If `use_inference_mode` is False (e.g., for training/fine-tuning):
+ |            Shape (Batch_size, N_classes, N_samples), suitable for NLLLoss.
+ |          - If `return_raw_logits` is True: Shape (n_estimators, n_samples, n_classes)
+ |
+ |  get_embeddings(
+ |      self,
+ |      X: 'XType',
+ |      data_source: "Literal['train', 'test']" = 'test'
+ |  ) -> 'np.ndarray'
+ |      Get embeddings for the input data ``X``.
+ |
+ |      Args:
+ |          X : XType
+ |              The input data.
+ |          data_source : {"train", "test"}, default="test"
+ |              Select the transformer output to return. Use ``"train"`` to obtain
+ |              embeddings from the training tokens and ``"test"`` for the test
+ |              tokens. When ``n_estimators > 1`` the returned array has shape
+ |              ``(n_estimators, n_samples, embedding_dim)``.
+ |
+ |      Returns:
+ |          np.ndarray
+ |              The computed embeddings for each fitted estimator.
+ |
+ |  get_preprocessed_datasets(
+ |      self,
+ |      X_raw: 'XType | list[XType]',
+ |      y_raw: 'YType | list[YType]',
+ |      split_fn: 'Callable',
+ |      max_data_size: 'None | int' = 10000,
+ |      *,
+ |      equal_split_size: 'bool' = True
+ |  ) -> 'DatasetCollectionWithPreprocessing'
+ |      Transforms raw input data into a collection of datasets,
+ |      with varying preprocessings.
+ |
+ |      The helper function initializes an RNG. This RNG is passed to the
+ |      `DatasetCollectionWithPreprocessing` class. When an item (dataset)
+ |      is retrieved, the collection's preprocessing routine uses this stored
+ |      RNG to generate seeds for its individual workers/pipelines, ensuring
+ |      reproducible stochastic transformations from a fixed initial state.
+ |
+ |      Args:
+ |          X_raw: single or list of input dataset features, in case of single it
+ |          is converted to list inside get_preprocessed_datasets_helper()
+ |          y_raw: single or list of input dataset labels, in case of single it
+ |          is converted to list inside get_preprocessed_datasets_helper()
+ |          split_fn: A function to dissect a dataset into train and test partition.
+ |          max_data_size: Maximum allowed number of samples in one dataset.
+ |          If None, datasets are not splitted.
+ |          equal_split_size: If True, splits data into equally sized chunks under
+ |          max_data_size.
+ |          If False, splits into chunks of size `max_data_size`, with
+ |          the last chunk having the remainder samples but is dropped if its
+ |          size is less than 2.
+ |
+ |  logits_to_probabilities(
+ |      self,
+ |      raw_logits: 'np.ndarray | torch.Tensor',
+ |      *,
+ |      softmax_temperature: 'float | None' = None,
+ |      average_before_softmax: 'bool | None' = None,
+ |      balance_probabilities: 'bool | None' = None
+ |  ) -> 'torch.Tensor'
+ |      Convert logits to probabilities using the classifier's post-processing.
+ |
+ |      Args:
+ |          raw_logits: Logits with shape (n_estimators, n_samples, n_classes) or
+ |              (n_samples, n_classes). If the logits have three dimensions, they are
+ |              averaged across the estimator dimension (dim=0).
+ |          softmax_temperature: Optional override for temperature scaling.
+ |          average_before_softmax: Optional override for averaging order.
+ |          balance_probabilities: Optional override for probability balancing.
+ |
+ |      Returns:
+ |          Probabilities with shape (n_samples, n_classes).
+ |
+ |  predict(self, X: 'XType') -> 'np.ndarray'
+ |      Predict the class labels for the provided input samples.
+ |
+ |      Args:
+ |          X: The input data for prediction.
+ |
+ |      Returns:
+ |          The predicted class labels as a NumPy array.
+ |
+ |  predict_logits(self, X: 'XType') -> 'np.ndarray'
+ |      Predict the raw logits for the provided input samples.
+ |
+ |      Logits represent the unnormalized log-probabilities of the classes
+ |      before the softmax activation function is applied.
+ |
+ |      Args:
+ |          X: The input data for prediction.
+ |
+ |      Returns:
+ |          The predicted logits as a NumPy array. Shape (n_samples, n_classes).
+ |
+ |  predict_proba(self, X: 'XType') -> 'np.ndarray'
+ |      Predict the probabilities of the classes for the provided input samples.
+ |
+ |      This is a wrapper around the `_predict_proba` method.
+ |
+ |      Args:
+ |          X: The input data for prediction.
+ |
+ |      Returns:
+ |          The predicted probabilities of the classes as a NumPy array.
+ |          Shape (n_samples, n_classes).
+ |
+ |  predict_raw_logits(self, X: 'XType') -> 'np.ndarray'
+ |      Predict the raw logits for the provided input samples.
+ |
+ |      Logits represent the unnormalized log-probabilities of the classes
+ |      before the softmax activation function is applied. In contrast to the
+ |      `predict_logits` method, this method returns the raw logits for each
+ |      estimator, without averaging estimators or temperature scaling.
+ |
+ |      Args:
+ |          X: The input data for prediction.
+ |
+ |      Returns:
+ |          An array of predicted logits for each estimator,
+ |          Shape (n_estimators, n_samples, n_classes).
+ |
+ |  save_fit_state(self, path: 'Path | str') -> 'None'
+ |      Save a fitted classifier, light wrapper around save_fitted_tabpfn_model.
+ |
+ |  set_score_request(
+ |      self: tabpfn.classifier.TabPFNClassifier,
+ |      *,
+ |      sample_weight: Union[bool, NoneType, str] = '$UNCHANGED$'
+ |  ) -> tabpfn.classifier.TabPFNClassifier from sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>
+ |      Request metadata passed to the ``score`` method.
+ |
+ |      Note that this method is only relevant if
+ |      ``enable_metadata_routing=True`` (see :func:`sklearn.set_config`).
+ |      Please see :ref:`User Guide <metadata_routing>` on how the routing
+ |      mechanism works.
+ |
+ |      The options for each parameter are:
+ |
+ |      - ``True``: metadata is requested, and passed to ``score`` if provided. The request is ignored if metadata is not provided.
+ |
+ |      - ``False``: metadata is not requested and the meta-estimator will not pass it to ``score``.
+ |
+ |      - ``None``: metadata is not requested, and the meta-estimator will raise an error if the user provides it.
+ |
+ |      - ``str``: metadata should be passed to the meta-estimator with this given alias instead of the original name.
+ |
+ |      The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the
+ |      existing request. This allows you to change the request for some
+ |      parameters and not others.
+ |
+ |      .. versionadded:: 1.3
+ |
+ |      .. note::
+ |          This method is only relevant if this estimator is used as a
+ |          sub-estimator of a meta-estimator, e.g. used inside a
+ |          :class:`~sklearn.pipeline.Pipeline`. Otherwise it has no effect.
+ |
+ |      Parameters
+ |      ----------
+ |      sample_weight : str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED
+ |          Metadata routing for ``sample_weight`` parameter in ``score``.
+ |
+ |      Returns
+ |      -------
+ |      self : object
+ |          The updated object.
+ |
+ |  ----------------------------------------------------------------------
+ |  Class methods defined here:
+ |
+ |  create_default_for_version(version: 'ModelVersion', **overrides) -> 'Self'
+ |      Construct a classifier that uses the given version of the model.
+ |
+ |      In addition to selecting the model, this also configures certain settings to the
+ |      default values associated with this model version.
+ |
+ |      Any kwargs will override the default settings.
+ |
+ |  load_from_fit_state(path: 'Path | str', *, device: 'str | torch.device' = 'cpu') -> 'TabPFNClassifier'
+ |      Restore a fitted clf, light wrapper around load_fitted_tabpfn_model.
+ |
+ |  ----------------------------------------------------------------------
+ |  Readonly properties defined here:
+ |
+ |  model_
+ |      The model used for inference.
+ |
+ |      This is set after the model is loaded and initialized.
+ |
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |
+ |  __annotations__ = {'class_counts_': 'npt.NDArray[Any]', 'classes_': 'n...
+ |
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from sklearn.base.ClassifierMixin:
+ |
+ |  score(self, X, y, sample_weight=None)
+ |      Return the mean accuracy on the given test data and labels.
+ |
+ |      In multi-label classification, this is the subset accuracy
+ |      which is a harsh metric since you require for each sample that
+ |      each label set be correctly predicted.
+ |
+ |      Parameters
+ |      ----------
+ |      X : array-like of shape (n_samples, n_features)
+ |          Test samples.
+ |
+ |      y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+ |          True labels for `X`.
+ |
+ |      sample_weight : array-like of shape (n_samples,), default=None
+ |          Sample weights.
+ |
+ |      Returns
+ |      -------
+ |      score : float
+ |          Mean accuracy of ``self.predict(X)`` w.r.t. `y`.
+ |
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from sklearn.base.ClassifierMixin:
+ |
+ |  __dict__
+ |      dictionary for instance variables
+ |
+ |  __weakref__
+ |      list of weak references to the object
+ |
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from sklearn.base.BaseEstimator:
+ |
+ |  __getstate__(self)
+ |      Helper for pickle.
+ |
+ |  __repr__(self, N_CHAR_MAX=700)
+ |      Return repr(self).
+ |
+ |  __setstate__(self, state)
+ |
+ |  __sklearn_clone__(self)
+ |
+ |  get_params(self, deep=True)
+ |      Get parameters for this estimator.
+ |
+ |      Parameters
+ |      ----------
+ |      deep : bool, default=True
+ |          If True, will return the parameters for this estimator and
+ |          contained subobjects that are estimators.
+ |
+ |      Returns
+ |      -------
+ |      params : dict
+ |          Parameter names mapped to their values.
+ |
+ |  set_params(self, **params)
+ |      Set the parameters of this estimator.
+ |
+ |      The method works on simple estimators as well as on nested objects
+ |      (such as :class:`~sklearn.pipeline.Pipeline`). The latter have
+ |      parameters of the form ``<component>__<parameter>`` so that it's
+ |      possible to update each component of a nested object.
+ |
+ |      Parameters
+ |      ----------
+ |      **params : dict
+ |          Estimator parameters.
+ |
+ |      Returns
+ |      -------
+ |      self : estimator instance
+ |          Estimator instance.
+ |
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from sklearn.utils._metadata_requests._MetadataRequester:
+ |
+ |  get_metadata_routing(self)
+ |      Get metadata routing of this object.
+ |
+ |      Please check :ref:`User Guide <metadata_routing>` on how the routing
+ |      mechanism works.
+ |
+ |      Returns
+ |      -------
+ |      routing : MetadataRequest
+ |          A :class:`~sklearn.utils.metadata_routing.MetadataRequest` encapsulating
+ |          routing information.
+ |
+ |  ----------------------------------------------------------------------
+ |  Class methods inherited from sklearn.utils._metadata_requests._MetadataRequester:
+ |
+ |  __init_subclass__(**kwargs)
+ |      Set the ``set_{method}_request`` methods.
+ |
+ |      This uses PEP-487 [1]_ to set the ``set_{method}_request`` methods. It
+ |      looks for the information available in the set default values which are
+ |      set using ``__metadata_request__*`` class attributes, or inferred
+ |      from method signatures.
+ |
+ |      The ``__metadata_request__*`` class attributes are used when a method
+ |      does not explicitly accept a metadata through its arguments or if the
+ |      developer would like to specify a request value for those metadata
+ |      which are different from the default ``None``.
+ |
+ |      References
+ |      ----------
+ |      .. [1] https://www.python.org/dev/peps/pep-0487
+
+[W1221 16:48:17.704480937 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
