@@ -1,0 +1,3 @@
+./run_splice.sh: line 2: 31566 Killed                     python run_tabpfn_experiments.py --datasets splice > ../results/splice_experiment_full.log 2>&1
+./run_splice.sh: line 3: syntax error near unexpected token `&'
+./run_splice.sh: line 3: `&1'

@@ -58,7 +58,7 @@ def _XGBoostClassifier(**kwargs):
 
 def SelectModelBuilder(name):
     if name == 'tabpfn':
-        return TabPFNWrapper(device='cpu', N_ensemble_configurations=32)
+        return TabPFNWrapper(device='cuda', N_ensemble_configurations=32)
     if name == 'XGBoost':
         return _XGBoostClassifier()
     if name == 'RandomForest':
@@ -83,7 +83,7 @@ def SelectModelBuilder(name):
 
 def ScoreModelBuilder(name):
     if name == 'tabpfn':
-        return TabPFNWrapper(device='cpu', N_ensemble_configurations=32)
+        return TabPFNWrapper(device='cuda', N_ensemble_configurations=32)
     if name == 'XGBoost':
         return _XGBoostClassifier()
     if name == 'RandomForest':

@@ -1,0 +1,76 @@
+{
+  "config": {
+    "init_lbl_size": 20,
+    "tst_size": 0.4,
+    "budget": 200,
+    "n_trials": 1,
+    "seed_start": 0,
+    "exp_name": "TabPFN",
+    "model": "tabpfn"
+  },
+  "datasets": {
+    "splice": {
+      "variance": 6.26,
+      "us_advantage": 3.93,
+      "description": "Splice junction gene sequences"
+    },
+    "ionosphere": {
+      "variance": 11.0,
+      "us_advantage": 3.24,
+      "description": "Radar returns from ionosphere"
+    },
+    "pol": {
+      "variance": 16.07,
+      "us_advantage": 2.84,
+      "description": "Political data"
+    }
+  },
+  "strategies": {
+    "US": {
+      "name": "margin-zhan",
+      "hs": "google-zhan",
+      "tool": "google",
+      "description": "Uncertainty Sampling (Compatible)"
+    },
+    "US-NC": {
+      "name": "margin-nc",
+      "hs": "google-zhan",
+      "tool": "google",
+      "description": "Uncertainty Sampling (Non-compatible)"
+    },
+    "Random": {
+      "name": "random",
+      "hs": "random",
+      "tool": "google",
+      "description": "Random Sampling (Baseline)"
+    },
+    "QBC": {
+      "name": "alipy_qbc",
+      "hs": "google-zhan",
+      "tool": "alipy",
+      "description": "Query By Committee"
+    },
+    "BALD": {
+      "name": "margin-zhan",
+      "hs": "google-zhan",
+      "tool": "google",
+      "description": "Bayesian Active Learning by Disagreement"
+    },
+    "Core-Set": {
+      "name": "skal_coreset",
+      "hs": "google-zhan",
+      "tool": "scikital",
+      "description": "Core-Set Selection"
+    }
+  },
+  "results": [
+    {
+      "dataset": "splice",
+      "strategy": "US",
+      "trial": 0,
+      "seed": 0,
+      "success": true,
+      "timestamp": "2025-12-22T20:58:19.797845"
+    }
+  ]
+}
