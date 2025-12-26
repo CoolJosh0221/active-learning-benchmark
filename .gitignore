@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Python Cache
+__pycache__/
+
 # active learning benchmark
 *.swp
 *.zip
