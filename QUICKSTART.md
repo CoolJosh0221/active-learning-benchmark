@@ -1,7 +1,9 @@
 # TabPFN Active Learning - Quick Start Guide
 
 ## 📋 Overview
+
 Reproduce active learning experiments using TabPFN on the top 3 datasets where Uncertainty Sampling (US) shows the best performance:
+
 - **Splice** (Variance: 6.26, US advantage: +3.93%)
 - **Ionosphere** (Variance: 11.00, US advantage: +3.24%)
 - **Pol** (Variance: 16.07, US advantage: +2.84%)
@@ -9,6 +11,7 @@ Reproduce active learning experiments using TabPFN on the top 3 datasets where U
 ## 🚀 Quick Start (5 minutes)
 
 ### 1. Setup Environment
+
 ```bash
 # Clone repository
 git clone https://github.com/CoolJosh0221/active-learning-benchmark.git
@@ -23,11 +26,27 @@ pip install -r requirements.txt
 pip install tabpfn
 
 # Install AL libraries
+# Note: These manual copy steps are required for the imports in the benchmark code to work.
+
+# 1. Setup ALiPy
+git clone https://github.com/ariapoy/ALiPy.git alipy-dev
+cp -r alipy-dev/alipy alipy-dev/alipy_dev
+
+# 2. Setup libact
 git clone https://github.com/CoolJosh0221/libact.git libact-dev
 cd libact-dev && python setup.py install && cd ..
+cp -r libact-dev/libact libact-dev/libact_dev
+
+# 3. Setup active-learning (Google)
+git clone https://github.com/ariapoy/active-learning.git
+
+# 4. Setup scikit-activeml
+git clone https://github.com/ariapoy/scikit-activeml.git scikit-activeml-dev
+cp -r scikit-activeml-dev/skactiveml scikit-activeml-dev/skactiveml_dev
 ```
 
 ### 2. Add TabPFN Support
+
 ```bash
 # Copy the TabPFN model wrapper to src/models/
 cp /path/to/tabpfn_model.py src/models/
@@ -42,6 +61,7 @@ chmod +x results/analyze_tabpfn_results.py
 ```
 
 ### 3. Download Datasets
+
 ```bash
 cd data
 bash get_data_zhan21.sh
@@ -49,12 +69,14 @@ cd ..
 ```
 
 ### 4. Run Quick Test
+
 ```bash
 cd src
 python run_tabpfn_experiments.py --quick_test
 ```
 
 ### 5. Run Full Experiments
+
 ```bash
 # Run all experiments (will take several hours)
 python run_tabpfn_experiments.py
@@ -64,6 +86,7 @@ python run_tabpfn_experiments.py --datasets splice --strategies US Random
 ```
 
 ### 6. Analyze Results
+
 ```bash
 cd ../results
 python analyze_tabpfn_results.py --datasets splice ionosphere pol
@@ -72,6 +95,7 @@ python analyze_tabpfn_results.py --datasets splice ionosphere pol
 ## 📊 What You'll Get
 
 ### Result Files
+
 - `*-aubc.csv` - Area Under Budget Curve (main performance metric)
 - `*-detail.csv` - Detailed accuracy at each labeling iteration
 - `tabpfn_report.txt` - Summary statistics and rankings
@@ -79,6 +103,7 @@ python analyze_tabpfn_results.py --datasets splice ionosphere pol
 - `tabpfn_learning_curve_*.png` - Learning curves per dataset
 
 ### Key Metrics
+
 - **AUBC** (Area Under Budget Curve): Higher is better
 - **Final Accuracy**: Test set accuracy after full labeling budget
 - **Data Efficiency**: How quickly accuracy improves
@@ -86,6 +111,7 @@ python analyze_tabpfn_results.py --datasets splice ionosphere pol
 ## 🔧 Customization
 
 ### Modify Experimental Settings
+
 ```bash
 python run_tabpfn_experiments.py \
     --trials 20 \           # Number of independent runs
@@ -94,7 +120,9 @@ python run_tabpfn_experiments.py \
 ```
 
 ### Add More Query Strategies
+
 Edit `run_tabpfn_experiments.py`:
+
 ```python
 QUERY_STRATEGIES = {
     'US': {...},
@@ -109,7 +137,9 @@ QUERY_STRATEGIES = {
 ```
 
 ### Use GPU Acceleration
+
 Edit `tabpfn_model.py` or pass device parameter:
+
 ```python
 model = TabPFNWrapper(device='cuda')
 ```
@@ -117,11 +147,13 @@ model = TabPFNWrapper(device='cuda')
 ## ⚠️ Important Notes
 
 ### TabPFN Constraints
+
 - **Max 10,000 training samples** - Automatically truncated
 - **Max 100 features** - Uses first 100 features
 - **Binary/Multi-class only** - No regression support
 
 ### Recommended Settings
+
 ```python
 # Standard (balanced)
 N_ensemble_configurations = 32
@@ -136,23 +168,27 @@ N_ensemble_configurations = 64
 ## 🐛 Troubleshooting
 
 ### Problem: "No module named 'tabpfn'"
+
 ```bash
 pip install tabpfn
 ```
 
 ### Problem: "CUDA out of memory"
+
 ```python
 # Use CPU instead
 model = TabPFNWrapper(device='cpu')
 ```
 
 ### Problem: "Dataset not found"
+
 ```bash
 cd data
 bash get_data_zhan21.sh
 ```
 
 ### Problem: Import errors for libact/alipy
+
 ```bash
 export PYTHONPATH="${PYTHONPATH}:$(pwd)/libact-dev:$(pwd)/alipy-dev"
 ```
@@ -162,16 +198,19 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)/libact-dev:$(pwd)/alipy-dev"
 Based on the variance analysis, you should see:
 
 ### Splice Dataset
+
 - ✅ US should outperform other strategies
 - ✅ Low variance across trials (consistent results)
 - ✅ ~+3.93% advantage over median
 
 ### Ionosphere Dataset
+
 - ✅ US should show strong performance
 - ✅ Moderate variance
 - ✅ ~+3.24% advantage over median
 
 ### Pol Dataset
+
 - ✅ Very high accuracy (~98%)
 - ✅ US maintains advantage
 - ✅ ~+2.84% advantage over median
@@ -193,9 +232,9 @@ Based on the variance analysis, you should see:
 
 ## 📖 References
 
-- TabPFN Paper: https://arxiv.org/abs/2207.01848
-- AL Benchmark Paper: https://openreview.net/pdf?id=855yo1Ubt2
-- Original Repository: https://github.com/ariapoy/active-learning-benchmark
+- TabPFN Paper: <https://arxiv.org/abs/2207.01848>
+- AL Benchmark Paper: <https://openreview.net/pdf?id=855yo1Ubt2>
+- Original Repository: <https://github.com/ariapoy/active-learning-benchmark>
 
 ## 💡 Tips
 

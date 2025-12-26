@@ -1,11 +1,13 @@
 # TabPFN Active Learning Reproduction Guide
 
 ## Overview
+
 This guide will help you reproduce the active learning benchmark experiments using TabPFN on the top 3 datasets: **Splice**, **Ionosphere**, and **Pol**.
 
 ## Step 1: Environment Setup
 
 ### 1.1 Clone and Setup Repository
+
 ```bash
 # Clone the benchmark repository
 git clone https://github.com/ariapoy/active-learning-benchmark.git
@@ -20,6 +22,7 @@ pip install -r requirements.txt
 ```
 
 ### 1.2 Install TabPFN
+
 ```bash
 # Install TabPFN
 pip install tabpfn
@@ -31,6 +34,7 @@ pip install tabpfn
 ```
 
 ### 1.3 Install Additional Dependencies
+
 ```bash
 # Clone required active learning libraries
 git clone https://github.com/ariapoy/active-learning.git
@@ -46,6 +50,7 @@ cp -r libact-dev/libact libact-dev/libact_dev
 ```
 
 ### 1.4 Download Datasets
+
 ```bash
 cd data
 bash get_data_zhan21.sh  # This downloads all datasets
@@ -296,6 +301,7 @@ if __name__ == '__main__':
 ```
 
 ### 3.1 Make the Script Executable
+
 ```bash
 chmod +x src/run_tabpfn_experiments.py
 ```
@@ -303,6 +309,7 @@ chmod +x src/run_tabpfn_experiments.py
 ## Step 4: Run Experiments
 
 ### 4.1 Quick Test (Single Experiment)
+
 ```bash
 cd src
 python main.py \
@@ -319,12 +326,14 @@ python main.py \
 ```
 
 ### 4.2 Run Full Experiments
+
 ```bash
 cd src
 python run_tabpfn_experiments.py
 ```
 
 ### 4.3 Parallel Execution (Optional)
+
 For faster execution, you can run experiments in parallel:
 
 ```bash
@@ -344,11 +353,14 @@ python run_tabpfn_experiments.py --dataset pol &
 ## Step 5: Analysis and Results
 
 ### 5.1 Locate Results
+
 Results will be saved in the `results/` directory:
+
 - `*-aubc.csv`: Area Under Budget Curve (main metric)
 - `*-detail.csv`: Detailed performance at each iteration
 
 ### 5.2 Analyze Results
+
 ```bash
 cd results
 python analysis.py
@@ -449,14 +461,18 @@ if __name__ == '__main__':
 ### Common Issues and Solutions
 
 #### Issue 1: TabPFN Training Sample Limit
+
 **Problem**: Dataset has > 10,000 samples
 **Solution**: The wrapper automatically truncates to 10,000 samples. Consider:
+
 - Using a smaller initial pool
 - Sampling from the unlabeled pool
 
 #### Issue 2: TabPFN Feature Limit
+
 **Problem**: Dataset has > 100 features
 **Solution**: Apply feature selection before using TabPFN:
+
 ```python
 from sklearn.feature_selection import SelectKBest, f_classif
 
@@ -465,8 +481,10 @@ X_selected = selector.fit_transform(X, y)
 ```
 
 #### Issue 3: GPU Memory Issues
+
 **Problem**: CUDA out of memory
 **Solution**: Use CPU mode or reduce ensemble size:
+
 ```python
 # Use CPU
 model = TabPFNWrapper(device='cpu')
@@ -476,8 +494,10 @@ model = TabPFNWrapper(N_ensemble_configurations=16, device='cuda')
 ```
 
 #### Issue 4: Import Errors
+
 **Problem**: Cannot import libact or alipy
 **Solution**: Ensure paths are correct:
+
 ```bash
 export PYTHONPATH="${PYTHONPATH}:$(pwd)/libact-dev:$(pwd)/alipy-dev"
 ```
@@ -487,16 +507,19 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)/libact-dev:$(pwd)/alipy-dev"
 Based on your variance analysis, you should expect:
 
 ### Splice (Best Dataset)
+
 - **Variance**: 6.26 (good consistency)
 - **Expected US advantage**: +3.93% over median
 - TabPFN should perform well due to stable patterns
 
 ### Ionosphere
+
 - **Variance**: 11.00 (moderate consistency)
 - **Expected US advantage**: +3.24% over median
 - Good test case for TabPFN's uncertainty estimates
 
 ### Pol
+
 - **Variance**: 16.07 (moderate consistency)
 - **Expected US advantage**: +2.84% over median
 - High absolute performance (~98% US score)
@@ -504,7 +527,8 @@ Based on your variance analysis, you should expect:
 ## Step 8: Next Steps
 
 ### Extend the Experiments
-1. **Add more query strategies**: 
+
+1. **Add more query strategies**:
    - DWUS (Density Weighted Uncertainty Sampling)
    - ALBL (Active Learning By Learning)
    - LAL (Learning Active Learning)
@@ -525,10 +549,10 @@ Based on your variance analysis, you should expect:
 
 ## Additional Resources
 
-- TabPFN Paper: https://arxiv.org/abs/2207.01848
-- TabPFN GitHub: https://github.com/automl/TabPFN
-- Original AL Benchmark: https://arxiv.org/abs/2306.08954
-- LibAct Documentation: https://github.com/ntucllab/libact
+- TabPFN Paper: <https://arxiv.org/abs/2207.01848>
+- TabPFN GitHub: <https://github.com/automl/TabPFN>
+- Original AL Benchmark: <https://arxiv.org/abs/2306.08954>
+- LibAct Documentation: <https://github.com/ntucllab/libact>
 
 ## Notes
 
