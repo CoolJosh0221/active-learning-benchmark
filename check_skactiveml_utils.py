@@ -1,6 +1,6 @@
-
 try:
     import skactiveml.pool.utils as utils
+
     print("Contents of skactiveml.pool.utils:")
     print(dir(utils))
 except ImportError as e:

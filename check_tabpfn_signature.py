@@ -1,4 +1,3 @@
-
 import inspect
 from tabpfn import TabPFNClassifier
 
