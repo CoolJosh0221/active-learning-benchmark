@@ -40,7 +40,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
     def __init__(
         self,
         N_ensemble_configurations=32,
-        device="cpu",
+        device=None,
         max_samples=10000,
         max_features=100,
         **kwargs,
@@ -52,13 +52,34 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             N_ensemble_configurations (int): Number of ensemble members (default: 32)
                 - Larger values = better performance but slower
                 - Typical range: 16-64
-            device (str): 'cpu' or 'cuda' for GPU acceleration
+            device (str): 'cpu', 'cuda', 'mps', or None (auto-detect)
             max_samples (int): Maximum number of training samples (default: 10000)
             max_features (int): Maximum number of features (default: 100)
             **kwargs: Additional arguments passed to TabPFNClassifier
         """
         self.N_ensemble_configurations = N_ensemble_configurations
+        
+        # Smart device selection
+        if device is None:
+            if torch.cuda.is_available():
+                device = 'cuda'
+            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+                 device = 'mps'
+            else:
+                device = 'cpu'
+        
+        # Validate device availability
+        if device.startswith('cuda') and not torch.cuda.is_available():
+            warnings.warn(f"Device '{device}' requested but CUDA is not available. Falling back to CPU.")
+            device = 'cpu'
+        
+        if device == 'mps' and not (torch.backends.mps.is_available() and torch.backends.mps.is_built()):
+            warnings.warn(f"Device '{device}' requested but MPS is not available. Falling back to CPU.")
+            device = 'cpu'
+            
         self.device = device
+        # print(f"TabPFNWrapper using device: {self.device}")
+        
         self.max_samples = max_samples
         self.max_features = max_features
         self.kwargs = kwargs
