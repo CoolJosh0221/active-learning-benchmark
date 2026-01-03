@@ -49,12 +49,9 @@ QUERY_STRATEGIES = {
         "tool": "google",
         "description": "Random Sampling (Baseline)",
     },
-    "QBC": {
-        "name": "alipy_qbc",
-        "hs": "google-zhan",
-        "tool": "alipy",
-        "description": "Query By Committee",
-    },
+    # QBC removed: ALiPy's QBC creates its own model committee internally,
+    # which bypasses TabPFN and causes ~2hr timeouts per iteration.
+    # QBC is designed for fast-training models (SVM, LR), not TabPFN.
     "BALD": {
         "name": "margin-zhan",  # Use US as proxy for BALD if not available
         "hs": "google-zhan",
