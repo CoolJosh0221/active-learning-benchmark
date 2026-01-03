@@ -74,7 +74,7 @@ DEFAULT_CONFIG = {
     "init_lbl_size": 20,  # Initial labeled pool size
     "tst_size": 0.4,  # Test set size (40%)
     "budget": 200,  # Total labeling budget
-    "n_trials": 10,  # Number of independent trials
+    "n_trials": 150,  # Number of independent trials (matches original paper)
     "seed_start": 0,  # Starting seed for trials
     "exp_name": "TabPFN",  # Experiment name
     "model": "tabpfn",  # Model type
@@ -156,6 +156,7 @@ class ExperimentRunner:
             str(self.config["budget"]),
             "--exp_name",
             self.config["exp_name"],
+            "--scale",  # StandardScaler preprocessing (matches original paper)
         ]
 
         self.log(f"Running: {strategy_name} on {dataset} (seed={seed})")
