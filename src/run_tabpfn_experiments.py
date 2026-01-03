@@ -10,6 +10,7 @@ import os
 import sys
 import subprocess
 import argparse
+import pandas as pd
 from pathlib import Path
 from datetime import datetime
 import json
@@ -30,33 +31,31 @@ DATASETS = {
 }
 
 # Query strategies to evaluate
+# Map strategy keys to their actual names in config.py
 QUERY_STRATEGIES = {
     "US": {
-        "name": "margin-zhan",
+        "name": "google_us_margin",  # Using standard name
         "hs": "google-zhan",
         "tool": "google",
-        "description": "Uncertainty Sampling (Compatible)",
+        "description": "Uncertainty Sampling (Margin)",
     },
-    "US-NC": {
-        "name": "margin-nc",
+    "Entropy": {
+        "name": "us_ent",
         "hs": "google-zhan",
         "tool": "google",
-        "description": "Uncertainty Sampling (Non-compatible)",
+        "description": "Uncertainty Sampling (Entropy)",
+    },
+    "DWUS": {
+        "name": "dwus",
+        "hs": "google-zhan",
+        "tool": "google",
+        "description": "Density-Weighted Uncertainty Sampling",
     },
     "Random": {
-        "name": "random",
+        "name": "uniform",           # Using standard name
         "hs": "random",
         "tool": "google",
         "description": "Random Sampling (Baseline)",
-    },
-    # QBC removed: ALiPy's QBC creates its own model committee internally,
-    # which bypasses TabPFN and causes ~2hr timeouts per iteration.
-    # QBC is designed for fast-training models (SVM, LR), not TabPFN.
-    "BALD": {
-        "name": "margin-zhan",  # Use US as proxy for BALD if not available
-        "hs": "google-zhan",
-        "tool": "google",
-        "description": "Bayesian Active Learning by Disagreement",
     },
     "Core-Set": {
         "name": "skal_coreset",
@@ -112,6 +111,40 @@ class ExperimentRunner:
         with open(self.log_file, "a") as f:
             f.write(log_msg + "\n")
 
+    def check_result_exists(self, dataset, strategy_name, seed):
+        """
+        Check if the AUBC result file already exists for this seed
+
+        Args:
+            dataset: Dataset name
+            strategy_name: Strategy key
+            seed: Random seed
+
+        Returns:
+            bool: True if result exists
+        """
+        strategy_config = QUERY_STRATEGIES[strategy_name]
+        qs_name = strategy_config["name"]
+        hs_name = self.config["model"]
+        gs_name = self.config["model"]
+        exp_name = self.config["exp_name"]
+        
+        # Pattern used by main.py for export_name
+        # dataset-qs_name-hs_name-gs_name-exp_name-aubc.csv
+        # Note: some suffixes like '-scale' might be added based on config
+        # We check for the specific seed in the file content if it exists
+        filename = f"{dataset}-{qs_name}-{hs_name}-{gs_name}-{exp_name}-aubc.csv"
+        file_path = Path(".") / filename # main.py outputs to current dir
+        
+        if file_path.exists():
+            try:
+                df = pd.read_csv(file_path)
+                if 'res_expno' in df.columns and seed in df['res_expno'].values:
+                    return True
+            except Exception:
+                pass
+        return False
+
     def run_single_experiment(self, dataset, strategy_name, seed):
         """
         Run a single experiment
@@ -124,6 +157,11 @@ class ExperimentRunner:
         Returns:
             success: Whether experiment succeeded
         """
+        # Resume Logic
+        if self.check_result_exists(dataset, strategy_name, seed):
+            self.log(f"Skipping: {strategy_name} on {dataset} (seed={seed}) - Already exists")
+            return True
+
         strategy = QUERY_STRATEGIES[strategy_name]
 
         cmd = [

@@ -186,14 +186,4 @@ def QueryStrategyBuilder(name):
     if name == 'skal_coreset':
         return { 'qs': CoreSet, 'params': {'random_state': 1126} }
 
-    # TabPFN experiment strategies
-    if name == 'margin-zhan':
-        return { "qs": AL_MAPPING["margin"], "params": {"seed": 1126 }}
-    if name == 'margin-nc':
-        return { "qs": AL_MAPPING["margin"], "params": {"seed": 1126 }}
-    if name == 'random':
-        return { "qs": AL_MAPPING["uniform"], "params": {"seed": 1126 }}
-    if name == 'core-set':
-        return { "qs": AL_MAPPING["kcenter"], "params": {"seed": 1126 }}
-
     raise NotImplementedError
