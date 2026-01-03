@@ -63,8 +63,7 @@ def SelectModelBuilder(name):
         return _XGBoostClassifier()
     if name == 'RandomForest':
         return _RandomForest()
-    if name == 'RBFSVM' or name == 'google-zhan':
-        # google-zhan is the original paper's name for SVM(RBF)
+    if name == 'RBFSVM':
         return _SVCBuilder()
     if name == 'RBFSVMProb':  # libact.eer
         return _SVCBuilder(probability=True)
@@ -95,8 +94,7 @@ def ScoreModelBuilder(name):
         return _logisticRegressionBuilder()
     if name == 'LRC=1e-1':
         return _logisticRegressionBuilder(C=0.1)
-    if name == 'RBFSVM' or name == 'zhan':
-        # zhan is the original paper's name for task-oriented SVM(RBF)
+    if name == 'RBFSVM':
         return _SVCBuilder()
 
     raise NotImplementedError
