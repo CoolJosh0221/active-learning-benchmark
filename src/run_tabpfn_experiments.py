@@ -49,12 +49,9 @@ QUERY_STRATEGIES = {
         "tool": "google",
         "description": "Random Sampling (Baseline)",
     },
-    "QBC": {
-        "name": "alipy_qbc",
-        "hs": "google-zhan",
-        "tool": "alipy",
-        "description": "Query By Committee",
-    },
+    # QBC removed: ALiPy's QBC creates its own model committee internally,
+    # which bypasses TabPFN and causes ~2hr timeouts per iteration.
+    # QBC is designed for fast-training models (SVM, LR), not TabPFN.
     "BALD": {
         "name": "margin-zhan",  # Use US as proxy for BALD if not available
         "hs": "google-zhan",
@@ -74,7 +71,7 @@ DEFAULT_CONFIG = {
     "init_lbl_size": 20,  # Initial labeled pool size
     "tst_size": 0.4,  # Test set size (40%)
     "budget": 200,  # Total labeling budget
-    "n_trials": 10,  # Number of independent trials
+    "n_trials": 150,  # Number of independent trials (matches original paper)
     "seed_start": 0,  # Starting seed for trials
     "exp_name": "TabPFN",  # Experiment name
     "model": "tabpfn",  # Model type
@@ -156,6 +153,7 @@ class ExperimentRunner:
             str(self.config["budget"]),
             "--exp_name",
             self.config["exp_name"],
+            "--scale",  # StandardScaler preprocessing (matches original paper)
         ]
 
         self.log(f"Running: {strategy_name} on {dataset} (seed={seed})")
@@ -166,7 +164,7 @@ class ExperimentRunner:
                 cmd,
                 capture_output=True,
                 text=True,
-                timeout=7200,  # 2 hours timeout
+                timeout=3600,  # 1 hour timeout
             )
 
             if result.returncode == 0:

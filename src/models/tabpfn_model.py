@@ -83,8 +83,16 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         self.max_samples = max_samples
         self.max_features = max_features
         self.kwargs = kwargs
-        self.model = None
         self._feature_indices = None
+
+        # Initialize TabPFNClassifier ONCE to avoid repeated model loading
+        # This is critical for active learning where fit() is called hundreds of times
+        self.model = TabPFNClassifier(
+            N_ensemble_configurations=self.N_ensemble_configurations,
+            device=self.device,
+            **self.kwargs,
+        )
+        self._fit_failed = False  # Track if fitting failed for fallback
 
     def _validate_and_truncate(self, X, y=None, fit_mode=True):
         """
@@ -143,19 +151,15 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         """
         X_processed, y_processed = self._validate_and_truncate(X, y, fit_mode=True)
 
-        self.model = TabPFNClassifier(
-            N_ensemble_configurations=self.N_ensemble_configurations,
-            device=self.device,
-            **self.kwargs,
-        )
-
+        # Reuse the pre-initialized model (don't re-instantiate!)
         try:
             self.model.fit(X_processed, y_processed)
+            self._fit_failed = False
         except Exception as e:
             warnings.warn(f"TabPFN fit failed: {e}. Using default predictions.")
             # Store classes for fallback
             self.classes_ = np.unique(y_processed)
-            self.model = None
+            self._fit_failed = True
 
         return self
 
@@ -169,7 +173,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         Returns:
             predictions: Predicted class labels
         """
-        if self.model is None:
+        if self._fit_failed:
             # Fallback: predict majority class
             return np.full(X.shape[0], self.classes_[0])
 
@@ -186,7 +190,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         Returns:
             probabilities: Predicted class probabilities
         """
-        if self.model is None:
+        if self._fit_failed:
             # Fallback: uniform probabilities
             n_classes = len(self.classes_)
             return np.full((X.shape[0], n_classes), 1.0 / n_classes)
@@ -211,7 +215,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
     @property
     def classes_(self):
         """Return class labels"""
-        if self.model is not None and hasattr(self.model, "classes_"):
+        if not self._fit_failed and hasattr(self.model, "classes_"):
             return self.model.classes_
         elif hasattr(self, "_classes"):
             return self._classes
