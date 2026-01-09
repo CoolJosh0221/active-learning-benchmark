@@ -23,7 +23,7 @@ done
 # N_EXP="10";  # number of experiments
 # END=$(($SEED + $N_EXP - 1));  # ending seed
 # BUDGET="3000";
-# for QS in "uniform-zhan" "margin-zhan" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
+# for QS in "uniform-zhan" "google_us_margin" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
 #   for data in "spambase" "banana" "phoneme" "ringnorm" "twonorm" "phishing" "pol" "bioresponse" "covertype"; do
 #     echo "Start $QS with $QUERY on $data limited budget $BUDGET, repeated $N_EXP times with $N_JOBS process."
 #       for s in $(seq $SEED $N_JOBS $END); do #

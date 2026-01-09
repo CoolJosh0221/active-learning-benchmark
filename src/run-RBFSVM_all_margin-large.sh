@@ -5,13 +5,13 @@ N_EXP="15";
 N_JOBS="5";
 END=$(($SEED + $N_EXP - 1));
 TOOL="google";
-QS="margin-zhan";
+QS="google_us_margin";
 
 # QUERY model
 QUERY="RBFSVM";
 # Task model
 
-## 3.3 margin-zhan
+## 3.3 google_us_margin
 for TASK in "RandomForest" "LR"; do
   for data in "banana" "twonorm"; do
     echo "Start $QS with $HS of $data on $EXP with $N_JOBS"

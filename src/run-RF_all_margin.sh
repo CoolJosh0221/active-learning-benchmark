@@ -5,13 +5,13 @@ N_EXP="150";
 N_JOBS="10";
 END=$(($SEED + $N_EXP - 1));
 TOOL="google";
-QS="margin-zhan";
+QS="google_us_margin";
 
 # QUERY model
 QUERY="RandomForest";
 # Task model
 
-## 3.3 margin-zhan
+## 3.3 google_us_margin
 for TASK in "RandomForest" "RBFSVM" "LR"; do
   # for data in "appendicitis" "sonar" "parkinsons" "ex8b" "heart" "haberman" "ionosphere" "clean1" "breast" "wdbc" "australian" "diabetes" "mammographic" "ex8a" "tic" "german" "splice" "gcloudb" "gcloudub" "checkerboard"; do
   # for data in "ex8a"; do

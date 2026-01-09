@@ -10,7 +10,7 @@ N_JOBS="10";  # number of process, depending on your resources and algorithms
 TOOL="google";
 
 echo "Small datasets!"
-for QS in "uniform-zhan" "margin-zhan" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
+for QS in "uniform-zhan" "google_us_margin" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
   for data in "appendicitis" "sonar" "parkinsons" "ex8b" "heart" "haberman" "ionosphere" "clean1" "breast" "wdbc" "australian" "diabetes" "mammographic" "ex8a" "tic" "german" "splice" "gcloudb" "gcloudub" "checkerboard"; do
     echo "Start $QS with $QUERY on $data, repeated $N_EXP times with $N_JOBS process."
       for s in $(seq $SEED $N_JOBS $END); do #
@@ -23,7 +23,7 @@ echo "Large datasets!"
 N_EXP="10";  # number of experiments
 END=$(($SEED + $N_EXP - 1));  # ending seed
 BUDGET="3000";
-for QS in "uniform-zhan" "margin-zhan" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
+for QS in "uniform-zhan" "google_us_margin" "hier-zhan" "mcm-zhan" "graph-zhan" "infodiv-zhan"; do
   for data in "spambase" "banana" "phoneme" "ringnorm" "twonorm" "phishing" "pol" "bioresponse" "covertype"; do
     echo "Start $QS with $QUERY on $data limited budget $BUDGET, repeated $N_EXP times with $N_JOBS process."
       for s in $(seq $SEED $N_JOBS $END); do #

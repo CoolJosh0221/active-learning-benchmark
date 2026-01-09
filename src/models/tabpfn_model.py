@@ -8,11 +8,12 @@ TabPFN has specific constraints:
 - Supports binary and multi-class classification
 """
 
-import torch
-import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
 import warnings
-import os
+
+import numpy as np
+import torch
+from sklearn.base import BaseEstimator, ClassifierMixin
+from tabpfn import TabPFNClassifier
 
 # Monkeypatch torch.load for compatibility with PyTorch 2.6+ and old TabPFN checkpoints
 # This is necessary because TabPFN v0.1.11 checkpoints contain non-primitive objects
@@ -27,8 +28,6 @@ def patched_torch_load(*args, **kwargs):
 
 
 torch.load = patched_torch_load
-
-from tabpfn import TabPFNClassifier
 
 
 class TabPFNWrapper(BaseEstimator, ClassifierMixin):
@@ -58,28 +57,34 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             **kwargs: Additional arguments passed to TabPFNClassifier
         """
         self.N_ensemble_configurations = N_ensemble_configurations
-        
+
         # Smart device selection
         if device is None:
             if torch.cuda.is_available():
-                device = 'cuda'
+                device = "cuda"
             elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-                 device = 'mps'
+                device = "mps"
             else:
-                device = 'cpu'
-        
+                device = "cpu"
+
         # Validate device availability
-        if device.startswith('cuda') and not torch.cuda.is_available():
-            warnings.warn(f"Device '{device}' requested but CUDA is not available. Falling back to CPU.")
-            device = 'cpu'
-        
-        if device == 'mps' and not (torch.backends.mps.is_available() and torch.backends.mps.is_built()):
-            warnings.warn(f"Device '{device}' requested but MPS is not available. Falling back to CPU.")
-            device = 'cpu'
-            
+        if device.startswith("cuda") and not torch.cuda.is_available():
+            warnings.warn(
+                f"Device '{device}' requested but CUDA is not available. Falling back to CPU."
+            )
+            device = "cpu"
+
+        if device == "mps" and not (
+            torch.backends.mps.is_available() and torch.backends.mps.is_built()
+        ):
+            warnings.warn(
+                f"Device '{device}' requested but MPS is not available. Falling back to CPU."
+            )
+            device = "cpu"
+
         self.device = device
         # print(f"TabPFNWrapper using device: {self.device}")
-        
+
         self.max_samples = max_samples
         self.max_features = max_features
         self.kwargs = kwargs
@@ -244,8 +249,8 @@ class TabPFNAccurate(TabPFNWrapper):
 if __name__ == "__main__":
     # Test the wrapper
     from sklearn.datasets import make_classification
-    from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
+    from sklearn.model_selection import train_test_split
 
     print("Testing TabPFN Wrapper")
     print("=" * 60)

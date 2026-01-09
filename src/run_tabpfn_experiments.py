@@ -45,6 +45,12 @@ QUERY_STRATEGIES = {
         "tool": "google",
         "description": "Uncertainty Sampling (Entropy)",
     },
+    "BALD": {
+        "name": "skal_bald",
+        "hs": "google-zhan",
+        "tool": "scikital",
+        "description": "Bayesian Active Learning by Disagreement",
+    },
     "DWUS": {
         "name": "dwus",
         "hs": "google-zhan",
