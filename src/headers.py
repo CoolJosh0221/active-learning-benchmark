@@ -55,8 +55,8 @@ from alipy_dev.query_strategy import QueryInstanceRandom, QueryInstanceUncertain
 from alipy_dev.experiment import State
 from alipy_dev.utils.multi_thread import aceThreading
 
-# For scikit-activeml
-sys.path.append("../scikit-activeml-dev/")
+# For scikit-activeml (insert at front to prioritize local version)
+sys.path.insert(0, "../scikit-activeml-dev/")
 from skactiveml_dev.utils import MISSING_LABEL, labeled_indices, unlabeled_indices
 from skactiveml_dev.classifier import SklearnClassifier
 from skactiveml_dev.pool import UncertaintySampling, BatchBALD, EpistemicUncertaintySampling, QueryByCommittee, Quire, MonteCarloEER, GreedyBALD, CoreSet

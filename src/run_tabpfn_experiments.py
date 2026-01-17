@@ -209,6 +209,7 @@ class ExperimentRunner:
                 capture_output=True,
                 text=True,
                 timeout=3600,  # 1 hour timeout
+                cwd=Path(__file__).parent,  # Run from src/ directory
             )
 
             if result.returncode == 0:

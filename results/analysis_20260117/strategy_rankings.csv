@@ -1,0 +1,13 @@
+dataset,rank,strategy,aubc_mean,aubc_std,n_trials
+ionosphere,1,BALD,0.9358,0.0171,10
+ionosphere,2,Uncertainty Sampling (US),0.9347,0.0167,10
+ionosphere,3,Core-Set,0.924,0.0132,10
+ionosphere,4,Random,0.9165,0.0175,10
+pol,1,BALD,0.9022,0.0088,10
+pol,2,Uncertainty Sampling (US),0.9017,0.0068,10
+pol,3,Random,0.8638,0.0142,10
+pol,4,Core-Set,0.788,0.0515,10
+splice,1,Uncertainty Sampling (US),0.7704,0.0188,20
+splice,2,BALD,0.7637,0.0147,10
+splice,3,Random,0.7418,0.0224,20
+splice,4,Core-Set,0.6899,0.0482,20

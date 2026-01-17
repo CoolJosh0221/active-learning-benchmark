@@ -1,0 +1,13 @@
+dataset,strategy,mean,std,count,min,max
+ionosphere,BALD,0.9358,0.0171,10,0.9123,0.9661
+ionosphere,Core-Set,0.924,0.0132,10,0.9046,0.9445
+ionosphere,Random,0.9165,0.0175,10,0.8962,0.9521
+ionosphere,Uncertainty Sampling (US),0.9347,0.0167,10,0.9139,0.9654
+pol,BALD,0.9022,0.0088,10,0.8874,0.9115
+pol,Core-Set,0.788,0.0515,10,0.662,0.8441
+pol,Random,0.8638,0.0142,10,0.8339,0.8794
+pol,Uncertainty Sampling (US),0.9017,0.0068,10,0.8907,0.911
+splice,BALD,0.7637,0.0147,10,0.7395,0.7897
+splice,Core-Set,0.6899,0.0482,20,0.6197,0.7579
+splice,Random,0.7418,0.0224,20,0.7043,0.7731
+splice,Uncertainty Sampling (US),0.7704,0.0188,20,0.7449,0.804

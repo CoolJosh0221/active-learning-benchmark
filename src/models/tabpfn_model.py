@@ -8,12 +8,23 @@ TabPFN has specific constraints:
 - Supports binary and multi-class classification
 """
 
+import sys
 import warnings
+from pathlib import Path
 
 import numpy as np
 import torch
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import BaseEstimator  # Used by sklearn utilities
 from tabpfn import TabPFNClassifier
+
+# Add skactiveml_dev to path for SkactivemlClassifier
+_project_root = Path(__file__).parent.parent.parent
+_skactiveml_path = _project_root / "scikit-activeml-dev"
+if str(_skactiveml_path) not in sys.path:
+    sys.path.insert(0, str(_skactiveml_path))
+
+from skactiveml_dev.base import SkactivemlClassifier
+from skactiveml_dev.utils import MISSING_LABEL
 
 # Monkeypatch torch.load for compatibility with PyTorch 2.6+ and old TabPFN checkpoints
 # This is necessary because TabPFN v0.1.11 checkpoints contain non-primitive objects
@@ -30,10 +41,11 @@ def patched_torch_load(*args, **kwargs):
 torch.load = patched_torch_load
 
 
-class TabPFNWrapper(BaseEstimator, ClassifierMixin):
+class TabPFNWrapper(SkactivemlClassifier):
     """
     Wrapper for TabPFN to work with the active learning benchmark.
     Handles automatic truncation when constraints are exceeded.
+    Inherits from SkactivemlClassifier for BALD compatibility.
     """
 
     def __init__(
@@ -42,6 +54,10 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
         device=None,
         max_samples=10000,
         max_features=100,
+        classes=None,
+        missing_label=MISSING_LABEL,
+        cost_matrix=None,
+        random_state=None,
         **kwargs,
     ):
         """
@@ -54,8 +70,20 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             device (str): 'cpu', 'cuda', 'mps', or None (auto-detect)
             max_samples (int): Maximum number of training samples (default: 10000)
             max_features (int): Maximum number of features (default: 100)
+            classes (array-like): Known class labels (default: None, auto-detected)
+            missing_label: Value representing missing labels (default: np.nan)
+            cost_matrix: Cost matrix for classification (default: None)
+            random_state: Random state for reproducibility (default: None)
             **kwargs: Additional arguments passed to TabPFNClassifier
         """
+        # Initialize SkactivemlClassifier parent
+        super().__init__(
+            classes=classes,
+            missing_label=missing_label,
+            cost_matrix=cost_matrix,
+            random_state=random_state,
+        )
+
         self.N_ensemble_configurations = N_ensemble_configurations
 
         # Smart device selection
@@ -83,7 +111,6 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             device = "cpu"
 
         self.device = device
-        # print(f"TabPFNWrapper using device: {self.device}")
 
         self.max_samples = max_samples
         self.max_features = max_features
@@ -98,6 +125,9 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             **self.kwargs,
         )
         self._fit_failed = False  # Track if fitting failed for fallback
+
+        # Expose ensemble size for BALD compatibility (scikit-activeml expects n_estimators)
+        self.n_estimators = self.N_ensemble_configurations
 
     def _validate_and_truncate(self, X, y=None, fit_mode=True):
         """
@@ -143,27 +173,39 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
 
         return X_processed, y_processed
 
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None):
         """
         Fit TabPFN model
 
         Args:
             X: Training features
-            y: Training labels
+            y: Training labels (may contain missing labels indicated by missing_label)
+            sample_weight: Sample weights (not used by TabPFN, but required by interface)
 
         Returns:
             self: Fitted estimator
         """
-        X_processed, y_processed = self._validate_and_truncate(X, y, fit_mode=True)
+        # Use SkactivemlClassifier's _validate_data to handle missing labels and set up classes_
+        X_validated, y_validated, sample_weight = super()._validate_data(
+            X, y, sample_weight=sample_weight
+        )
+
+        # Filter out samples with missing labels (encoded as -1 by _validate_data)
+        from skactiveml_dev.utils import is_labeled
+        labeled_mask = is_labeled(y_validated, missing_label=-1)
+        X_labeled = X_validated[labeled_mask]
+        y_labeled = y_validated[labeled_mask]
+
+        # Apply TabPFN-specific truncation
+        X_processed, y_processed = self._validate_and_truncate(X_labeled, y_labeled, fit_mode=True)
 
         # Reuse the pre-initialized model (don't re-instantiate!)
         try:
-            self.model.fit(X_processed, y_processed)
+            if len(X_processed) > 0:
+                self.model.fit(X_processed, y_processed)
             self._fit_failed = False
         except Exception as e:
             warnings.warn(f"TabPFN fit failed: {e}. Using default predictions.")
-            # Store classes for fallback
-            self.classes_ = np.unique(y_processed)
             self._fit_failed = True
 
         return self
@@ -176,14 +218,16 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             X: Features to predict
 
         Returns:
-            predictions: Predicted class labels
+            predictions: Predicted class labels (in original label space)
         """
         if self._fit_failed:
-            # Fallback: predict majority class
+            # Fallback: predict first class
             return np.full(X.shape[0], self.classes_[0])
 
         X_processed, _ = self._validate_and_truncate(X, fit_mode=False)
-        return self.model.predict(X_processed)
+        # TabPFN predicts in encoded space, convert back using _le
+        y_pred_encoded = self.model.predict(X_processed)
+        return self._le.inverse_transform(y_pred_encoded)
 
     def predict_proba(self, X):
         """
@@ -193,7 +237,7 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
             X: Features to predict
 
         Returns:
-            probabilities: Predicted class probabilities
+            probabilities: Predicted class probabilities (ordered by classes_)
         """
         if self._fit_failed:
             # Fallback: uniform probabilities
@@ -202,34 +246,6 @@ class TabPFNWrapper(BaseEstimator, ClassifierMixin):
 
         X_processed, _ = self._validate_and_truncate(X, fit_mode=False)
         return self.model.predict_proba(X_processed)
-
-    def score(self, X, y):
-        """
-        Return accuracy score
-
-        Args:
-            X: Features
-            y: True labels
-
-        Returns:
-            accuracy: Classification accuracy
-        """
-        predictions = self.predict(X)
-        return np.mean(predictions == y)
-
-    @property
-    def classes_(self):
-        """Return class labels"""
-        if not self._fit_failed and hasattr(self.model, "classes_"):
-            return self.model.classes_
-        elif hasattr(self, "_classes"):
-            return self._classes
-        return None
-
-    @classes_.setter
-    def classes_(self, value):
-        """Set class labels"""
-        self._classes = value
 
 
 class TabPFNFast(TabPFNWrapper):
